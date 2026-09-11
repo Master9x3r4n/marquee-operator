@@ -3,11 +3,12 @@
 #include <string>
 #include <vector>
 #include <array>
+#define HEIGHT 7
 using namespace std;
 
 void printMarquee(vector<array<string, 7>> characters, string text)
 {
-    string space = "      ";
+    string space = "      "; // contrary to the function below, this must be at start
 
     // Get ascii equivalents
     vector<int> ascii;
@@ -16,7 +17,7 @@ void printMarquee(vector<array<string, 7>> characters, string text)
         ascii.push_back(text[j]);
     }
 
-    for (int j = 0; j < 7; j ++) // 7 is height
+    for (int j = 0; j < HEIGHT; j ++)
     {
         for (size_t k = 0; k < text.length(); k ++)
         {
@@ -31,10 +32,10 @@ void printMarquee(vector<array<string, 7>> characters, string text)
 }
 
 // While I originally made this function by hand with AI assistance, I regenerated the code to accomodate for the fixed widths
-vector<array<string, 7>> initializeFont()
+vector<array<string, HEIGHT>> initializeFont()
 {
     ifstream inputFile("text/ascii_font.txt");
-    vector<array<string, 7>> characters;
+    vector<array<string, HEIGHT>> characters;
 
     if (!inputFile.is_open()) {
         cerr << "Error: Could not open ascii_font.txt" << endl;
@@ -42,7 +43,7 @@ vector<array<string, 7>> initializeFont()
     }
 
     int j = 0;
-    array<string, 7> character;
+    array<string, HEIGHT> character;
     string currLine;
 
     while (getline(inputFile, currLine))
@@ -52,9 +53,9 @@ vector<array<string, 7>> initializeFont()
         character[j] = currLine;
         j++;
 
-        if (j == 7)
+        if (j == HEIGHT)
         {
-            // Find bounding box of non-space columns across all 7 rows
+            // Find bounding box of non-space columns across all rows
             int left  = INT_MAX;
             int right = -1;
             for (const string& row : character)
@@ -69,18 +70,18 @@ vector<array<string, 7>> initializeFont()
                 }
             }
 
-            array<string, 7> trimmed;
+            array<string, HEIGHT> trimmed;
 
             if (right < left)
             {
                 // All-space glyph (the space character). Give it a fixed width.
-                for (int r = 0; r < 7; ++r)
-                    trimmed[r] = "   ";   // 3 cols wide, adjust to taste
+                for (int r = 0; r < HEIGHT; ++r)
+                    trimmed[r] = "      ";   // 5 cols wide, adjust to taste
             }
             else
             {
                 int width = right - left + 1;
-                for (int r = 0; r < 7; ++r)
+                for (int r = 0; r < HEIGHT; ++r)
                     trimmed[r] = character[r].substr(left, width);
             }
 

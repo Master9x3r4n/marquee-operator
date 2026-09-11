@@ -8,6 +8,8 @@ using namespace std;
 #include "header/marquee.h"
 #include "header/text.h"
 
+#define HEIGHT 7
+
 int main() 
 {
     vector<array<string, 7>> characters = initializeFont();
@@ -25,6 +27,7 @@ int main()
     bool isProgramRunning = true;
     string input = "";
     string marqueeText = "CSOPESY";
+    bool isMarqueeRunning = false;
     int refreshSpeed = 0;
     
     while (isProgramRunning)
@@ -48,11 +51,11 @@ int main()
         }
         else if (args[0] == "start_marquee")
         {
-            cout << "starts the marquee \"animation\"\n";
+            isMarqueeRunning = true;
         }        
         else if (args[0] == "stop_marquee")
         {
-            cout << "stops the marquee \"animation\"\n";
+            isMarqueeRunning = false;
         }
         else if (args[0] == "set_text")
         {
@@ -66,7 +69,7 @@ int main()
             if (args.size() < 2)
                 cout << "Invalid arguments. Usage: set_text <text>. Use \"help\" for more information\n";
             else
-                refreshSpeed = parseString(args[1]);
+                refreshSpeed = stoi(args[1]);
         }
         else if (args[0] == "exit")
         {

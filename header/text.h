@@ -17,8 +17,3 @@ vector<string> getArgs(string input)
 
     return args;
 }       
-
-int parseString(string input)
-{
-    return 0;
-}
