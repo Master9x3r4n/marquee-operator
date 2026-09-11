@@ -7,7 +7,7 @@ using namespace std;
 
 void printMarquee(vector<array<string, 7>> characters, string text)
 {
-    string space = "                    ";
+    string space = "      ";
 
     // Get ascii equivalents
     vector<int> ascii;
@@ -33,7 +33,7 @@ void printMarquee(vector<array<string, 7>> characters, string text)
 // While I originally made this function by hand with AI assistance, I regenerated the code to accomodate for the fixed widths
 vector<array<string, 7>> initializeFont()
 {
-    ifstream inputFile("header/ascii_font.txt");
+    ifstream inputFile("text/ascii_font.txt");
     vector<array<string, 7>> characters;
 
     if (!inputFile.is_open()) {
