@@ -2,7 +2,8 @@
 - Claro, Stephen Jakobb
 - Omandac, Karl Deejay
 
-This project contains a simple OS Emulator with a display output and command input. The main menu console consists of a scrolling ascii graphic marquee "animation" and Acceot commands to change the behavior of the text marquee. The following are the eligible commands to use:
+This project contains a simple OS Emulator with a display output and command input. The main menu console consists of a scrolling ascii graphic marquee "animation" and Acceot commands to change the behavior of the text marquee. 
+The following are the eligible commands to use:
 - help - displays the commands and its description
 - start_marquee - starts the marquee "animation"
 - stop_marquee - stops the marquee "animation"
@@ -11,6 +12,13 @@ This project contains a simple OS Emulator with a display output and command inp
 - exit - terminate the console
 
 This project was developed using **C++** and implements threading for the rotating marquee functionality.
+
+## Usage
+Compile and run the program using 
+```
+g++ -Wall -static -o main.exe main.cpp
+main
+```
 
 ## Credits
 Fonts obtained from https://patorjk.com/software/taag/
