@@ -19,6 +19,10 @@ Compile and run the program using
 g++ -Wall -static -o main.exe main.cpp
 main
 ```
+Or run using batch file
+```
+run
+```
 
 ## Credits
 Fonts obtained from https://patorjk.com/software/taag/
