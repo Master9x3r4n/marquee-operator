@@ -17,12 +17,21 @@ void view_help() {
 void set_text(string& marqueeText, vector<string> args) {
     if (args.size() < 2)
         cout << "Invalid arguments. Usage: set_text <text>. Use \"help\" for more information\n";
-    else
-        marqueeText = args[1];
+    else {
+        string text = "";
+        for (int i = 1; i < args.size(); i++) {
+            text = text + args[i];
+
+            if (i+1 < args.size())
+                text = text + " ";
+        }
+
+        marqueeText = text;
+    }
 }
 
 void set_speed(int& refreshSpeed, vector<string> args) {
-    if (args.size() < 2)
+    if (args.size() != 1)
         cout << "Invalid arguments. Usage: set_speed <text>. Use \"help\" for more information\n";
     else
         refreshSpeed = stoi(args[1]);
