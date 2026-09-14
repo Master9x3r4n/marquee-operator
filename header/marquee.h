@@ -5,14 +5,13 @@
 #include <vector>
 #include <array>
 #define HEIGHT 7
-using namespace std;
 
-void printMarquee(vector<array<string, 7>> characters, string text)
+void printMarquee(std::vector<std::array<std::string, 7>> characters, std::string text)
 {
-    string space = "      "; // contrary to the function below, this must be at start
+    std::string space = "      "; // contrary to the function below, this must be at start
 
     // Get ascii equivalents
-    vector<int> ascii;
+    std::vector<int> ascii;
     for (size_t j = 0; j < text.length(); j ++)
     {   
         ascii.push_back(text[j]);
@@ -24,30 +23,30 @@ void printMarquee(vector<array<string, 7>> characters, string text)
         {
             // 32 is starting off set for space char
             if (ascii[k] == 32)
-                cout << space;
+                std::cout << space;
             else
-                cout << characters[ascii[k] - 32][j]; 
+                std::cout << characters[ascii[k] - 32][j]; 
         }
-        cout << "\n";
+        std::cout << "\n";
     }
 }
 
 // While I originally made this function by hand with AI assistance, I regenerated the code to accomodate for the fixed widths
-vector<array<string, HEIGHT>> initializeFont()
+std::vector<std::array<std::string, HEIGHT>> initializeFont()
 {
-    ifstream inputFile("text/ascii_font.txt");
-    vector<array<string, HEIGHT>> characters;
+    std::ifstream inputFile("text/ascii_font.txt");
+    std::vector<std::array<std::string, HEIGHT>> characters;
 
     if (!inputFile.is_open()) {
-        cerr << "Error: Could not open ascii_font.txt" << endl;
+        std::cerr << "Error: Could not open ascii_font.txt" << std::endl;
         return characters;
     }
 
     int j = 0;
-    array<string, HEIGHT> character;
-    string currLine;
+    std::array<std::string, HEIGHT> character;
+    std::string currLine;
 
-    while (getline(inputFile, currLine))
+    while (std::getline(inputFile, currLine))
     {
         // Guard against short/long lines: pad or truncate so all rows match
         // (optional but safer — remove if your file is guaranteed uniform)
@@ -59,7 +58,7 @@ vector<array<string, HEIGHT>> initializeFont()
             // Find bounding box of non-space columns across all rows
             int left  = INT_MAX;
             int right = -1;
-            for (const string& row : character)
+            for (const std::string& row : character)
             {
                 for (int c = 0; c < (int)row.size(); ++c)
                 {
@@ -71,7 +70,7 @@ vector<array<string, HEIGHT>> initializeFont()
                 }
             }
 
-            array<string, HEIGHT> trimmed;
+            std::array<std::string, HEIGHT> trimmed;
 
             if (right < left)
             {

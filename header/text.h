@@ -2,18 +2,16 @@
 #include <string>
 #include <vector>
 #include <sstream>
-using namespace std;
 
-vector<string> getArgs(string input) 
+std::vector<std::string> getArgs(std::string input) 
 {
-    vector<string> args;
-    string word = "";
-    istringstream stream(input);
+    std::vector<std::string> args;
+    std::string word = "";
+    std::istringstream stream(input);
     
     // split string into vector
     while (stream >> word)
         args.push_back(word);
-
 
     return args;
 }       

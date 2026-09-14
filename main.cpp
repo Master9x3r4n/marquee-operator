@@ -3,7 +3,6 @@
 #include <vector>
 #include <sstream>
 #include <array>
-using namespace std;
 
 #include "header/marquee.h"
 #include "header/text.h"
@@ -13,23 +12,23 @@ using namespace std;
 
 int main() 
 {
-    vector<array<string, 7>> characters = initializeFont();
+    std::vector<std::array<std::string, 7>> characters = initializeFont();
 
     bool isProgramRunning = true;
-    string input = "";
-    string marqueeText = "CSOPESY";
+    std::string input = "";
+    std::string marqueeText = "CSOPESY";
     bool isMarqueeRunning = false;
     int refreshSpeed = 0;
     
     while (isProgramRunning)
     {
         printMarquee(characters, marqueeText);
-        cout << "Group Developer:\n" << "Claro, Stephen Jakobb G.\n" << "Omandac, Karl Deejay\n\n";
+        std::cout << "Group Developer:\n" << "Claro, Stephen Jakobb G.\n" << "Omandac, Karl Deejay\n\n";
     
-        cout << "Command>";
+        std::cout << "Command>";
 
-        getline(cin, input);
-        vector<string> args = getArgs(input);
+        std::getline(std::cin, input);
+        std::vector<std::string> args = getArgs(input);
 
         if (args[0] == "help")
         {
@@ -57,7 +56,7 @@ int main()
         }
         else
         {
-            cout << "Error. Unknown command input.\n";
+            std::cout << "Error. Unknown command input.\n";
         }
     }
 }
