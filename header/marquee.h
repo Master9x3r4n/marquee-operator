@@ -31,6 +31,32 @@ void printMarquee(std::vector<std::array<std::string, 7>> characters, std::strin
     }
 }
 
+void displayMarquee(std::vector<std::array<std::string, 7>> characters, std::string text) {
+    std::vector<char> v(text.begin(), text.end());
+    std::string s;
+    int n = text.length();
+    std::string empty = "";
+
+    // marquee text going from right to left
+    printMarquee(characters, "");
+    for (unsigned int i = 0; i <= n * 2; i++) {
+        // read marquee text up to the last character
+        // and display it as (n - s.len) spaces + text queue
+        if (i < n) {
+            s += text.substr(i, 1);
+            std::string render = empty;
+            render = render.insert(0, n - s.length(), ' ') + s;
+            printMarquee(characters, render);
+        }
+        // after reading all the chars, each char must disappear one by one, starting from left char
+        else {
+            s = s.substr(1, s.length() - 1);
+            printMarquee(characters, s);
+        }
+    }
+    printMarquee(characters, "");
+}
+
 // While I originally made this function by hand with AI assistance, I regenerated the code to accomodate for the fixed widths
 std::vector<std::array<std::string, HEIGHT>> initializeFont()
 {
