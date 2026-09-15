@@ -36,41 +36,43 @@ void clear_screen() {
     std::cout << "\033[H\033[J";
 }
 
+void clear_marquee() {
+    std::cout << "\033[1;10r";
+}
+
 void displayMarquee(std::vector<std::array<std::string, 7>> characters, std::string text, int refreshSpeed, bool isMarqueeRunning) {
     std::vector<char> v(text.begin(), text.end());
-    std::string s;
     unsigned int n = text.length();
     std::string empty = "";
 
     if (isMarqueeRunning) {
         while (isMarqueeRunning) {
+            std::string s;
             // marquee text going from right to left
-            clear_screen();
             printMarquee(characters, "");
             std::cout << std::flush;
             Sleep(refreshSpeed);
-            clear_screen();
+            clear_marquee();
             for (unsigned int i = 0; i <= n * 2; i++) {
                 // read marquee text up to the last character
                 // and display it as (n - s.len) spaces + text queue
                 if (i < n) {
                     s += text.substr(i, 1);
                     std::string render = empty;
-                    render = render.insert(0, n - s.length(), ' ') + s;
+                    render = render.insert(0, n - s.length() + 1, ' ') + s;
                     printMarquee(characters, render);
                 }
                 // after reading all the chars, each char must disappear one by one, starting from left char
                 else {
+                    std::string render = empty;
                     if (s.length() > 0)
-                        s = s.substr(1, s.length() - 1);
+                        s = s.substr(1, s.length() - 1) + render.insert(0, n - s.length() + 3, ' ');
                     printMarquee(characters, s);
                 }
                 std::cout << std::flush;
                 Sleep(refreshSpeed);
-                clear_screen();
+                clear_marquee();
             }
-            printMarquee(characters, "");
-            Sleep(refreshSpeed);
         }
     }
     else {
