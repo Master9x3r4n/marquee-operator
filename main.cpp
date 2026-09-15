@@ -18,12 +18,12 @@ int main()
     bool isProgramRunning = true;
     std::string marqueeText = "CSOPESY";
     bool isMarqueeRunning = false;
-    int refreshSpeed = 0;
+    int refreshSpeed = 1000;
 
     clear_screen();
+    displayMarquee(characters, marqueeText, refreshSpeed, isMarqueeRunning);
     while (isProgramRunning)
     {
-        printMarquee(characters, marqueeText);
         command_interface(isMarqueeRunning, marqueeText, refreshSpeed, isProgramRunning);
         clear_screen();
     }
