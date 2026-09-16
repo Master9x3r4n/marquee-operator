@@ -4,7 +4,8 @@
 #include <string>
 #include <vector>
 #include <array>
-#include <windows.h>
+#include <chrono>
+#include <thread>
 #define HEIGHT 7
 
 void printMarquee(std::vector<std::array<std::string, 7>> characters, std::string text)
@@ -40,18 +41,18 @@ void clear_marquee() {
     std::cout << "\033[1;10r";
 }
 
-void displayMarquee(std::vector<std::array<std::string, 7>> characters, std::string text, int refreshSpeed, bool isMarqueeRunning) {
+void displayMarquee(std::vector<std::array<std::string, 7>> characters, std::string text, int refreshSpeed, bool isMarqueeRunning, bool isProgramRunning) {
     std::vector<char> v(text.begin(), text.end());
     unsigned int n = text.length();
     std::string empty = "";
 
-    if (isMarqueeRunning) {
-        while (isMarqueeRunning) {
+    while (isProgramRunning) {
+        if (isMarqueeRunning) {
             std::string s;
             // marquee text going from right to left
             printMarquee(characters, "");
             std::cout << std::flush;
-            Sleep(refreshSpeed);
+            std::this_thread::sleep_for(std::chrono::milliseconds(refreshSpeed));
             clear_marquee();
             for (unsigned int i = 0; i <= n * 2; i++) {
                 // read marquee text up to the last character
@@ -70,13 +71,15 @@ void displayMarquee(std::vector<std::array<std::string, 7>> characters, std::str
                     printMarquee(characters, s);
                 }
                 std::cout << std::flush;
-                Sleep(refreshSpeed);
+                std::this_thread::sleep_for(std::chrono::milliseconds(refreshSpeed));
                 clear_marquee();
             }
         }
-    }
-    else {
-        printMarquee(characters, text);
+        else {
+            printMarquee(characters, text);
+            std::this_thread::sleep_for(std::chrono::milliseconds(refreshSpeed));
+            clear_marquee();
+        }
     }
 }
 
