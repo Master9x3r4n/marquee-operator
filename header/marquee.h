@@ -33,52 +33,56 @@ void printMarquee(std::vector<std::array<std::string, 7>> characters, std::strin
     }
 }
 
-void clear_screen() {
-    std::cout << "\033[H\033[J";
+void renderFrame(std::vector<std::array<std::string, 7>>& characters, std::string& text) {
+    std::cout << "\033[s"; // save cursur position
+
+    // clear rows 1 to 7 to remove artifacts
+    for (int i = 1; i <= 7; i++) {
+        std::cout << "\033[" << i << ";1H\033[2K";
+    }
+
+    std::cout << "\033[1;1H"; // jump to top-left
+    printMarquee(characters, text); // draw the frame
+    std::cout << "\033[u" << std::flush; // jump back to typing position
 }
 
-void clear_marquee() {
-    std::cout << "\033[1;10r";
-}
-
-void displayMarquee(std::vector<std::array<std::string, 7>> characters, std::string text, int refreshSpeed, bool isMarqueeRunning, bool isProgramRunning) {
+void displayMarquee(std::vector<std::array<std::string, 7>> characters, std::string text, int refreshSpeed, bool& isMarqueeRunning, bool& isProgramRunning) {
     std::vector<char> v(text.begin(), text.end());
     unsigned int n = text.length();
     std::string empty = "";
+    bool wasRunningLastFrame = true;
 
     while (isProgramRunning) {
         if (isMarqueeRunning) {
+            wasRunningLastFrame = true;
             std::string s;
+
             // marquee text going from right to left
-            printMarquee(characters, "");
-            std::cout << std::flush;
-            std::this_thread::sleep_for(std::chrono::milliseconds(refreshSpeed));
-            clear_marquee();
-            for (unsigned int i = 0; i <= n * 2; i++) {
+            for (unsigned int i = 0; i <= n * 2 && isProgramRunning && isMarqueeRunning; i++) {
                 // read marquee text up to the last character
                 // and display it as (n - s.len) spaces + text queue
+                std::string render = empty;
                 if (i < n) {
                     s += text.substr(i, 1);
-                    std::string render = empty;
                     render = render.insert(0, n - s.length() + 1, ' ') + s;
-                    printMarquee(characters, render);
                 }
                 // after reading all the chars, each char must disappear one by one, starting from left char
                 else {
-                    std::string render = empty;
                     if (s.length() > 0)
                         s = s.substr(1, s.length() - 1) + render.insert(0, n - s.length() + 3, ' ');
-                    printMarquee(characters, s);
+                    render = s;
                 }
-                std::cout << std::flush;
+                renderFrame(characters, render);
                 std::this_thread::sleep_for(std::chrono::milliseconds(refreshSpeed));
-                clear_marquee();
             }
         }
         else {
-            printMarquee(characters, text);
+            // force clear marquee then redraw text only once
+            if (wasRunningLastFrame) {
+                renderFrame(characters, text);
+                wasRunningLastFrame = false;
+            }
             std::this_thread::sleep_for(std::chrono::milliseconds(refreshSpeed));
-            clear_marquee();
         }
     }
 }
