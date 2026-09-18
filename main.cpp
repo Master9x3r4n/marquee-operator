@@ -13,18 +13,20 @@
 
 int main() 
 {
-    std::vector<std::array<std::string, 7>> characters = initializeFont();
-
     bool isProgramRunning = true;
-    std::string marqueeText = "CSOPESY";
     bool isMarqueeRunning = false;
-    int refreshSpeed = 1000;
+    std::string marqueeInput = "HELLO WORLD!";
+    std::vector<std::array<std::string, HEIGHT>> marqueeContainer;
+    Marquee marquee = Marquee(marqueeInput);
+    
+    isProgramRunning = marquee.initializeFont();
 
-    clear_screen();
-    displayMarquee(characters, marqueeText, refreshSpeed, isMarqueeRunning);
+    marquee.printMarquee();
+    std::cout << "Developer:\n" << "Claro, Stephen Jakobb G.\n\n"; 
     while (isProgramRunning)
     {
-        command_interface(isMarqueeRunning, marqueeText, refreshSpeed, isProgramRunning);
-        clear_screen();
+        commandInterface(isProgramRunning, isMarqueeRunning, marquee);
     }
+
+    return 0;
 }

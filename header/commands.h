@@ -1,18 +1,24 @@
 #include <iostream>
+#include <iomanip>
 #include <vector>
 #include <string>
 #include <stdexcept>
 
-void view_help() {
-    std::cout << "help - displays the commands and its description\n";
-    std::cout << "start_marquee - starts the marquee \"animation\"\n";
-    std::cout << "stop_marquee - stops the marquee \"animation\"\n";
-    std::cout << "set_text <text> - accepts a text input and displays it as a marquee\n";
-    std::cout << "set_speed <speed> - sets the marquee animation refresh in milliseconds\n";
-    std::cout << "exit - terminate the console\n";
+void viewHelp() {
+    const int colWidth = 24;
+
+    std::cout << "USAGE:\n"
+              << "  <command> [arguments]\n\n"
+              << "COMMANDS:\n"
+              << "  " << std::left << std::setw(colWidth) << "help"              << "Displays list of commands and descriptions\n"
+              << "  " << std::left << std::setw(colWidth) << "start_marquee"      << "Starts the marquee animation\n"
+              << "  " << std::left << std::setw(colWidth) << "stop_marquee"       << "Stops the marquee animation\n"
+              << "  " << std::left << std::setw(colWidth) << "set_text <text>"    << "Sets text input to display in the marquee\n"
+              << "  " << std::left << std::setw(colWidth) << "set_speed <speed>"  << "Sets animation refresh speed in milliseconds\n"
+              << "  " << std::left << std::setw(colWidth) << "exit"             << "Terminate the console\n\n";
 }
 
-void set_text(std::string& marqueeText, std::vector<std::string> args) {
+void setText(Marquee& marquee, std::vector<std::string> args) {
     if (args.size() < 2)
         std::cout << "Invalid arguments. Usage: set_text <text>. Use \"help\" for more information\n";
     else {
@@ -24,21 +30,30 @@ void set_text(std::string& marqueeText, std::vector<std::string> args) {
                 text = text + " ";
         }
 
-        marqueeText = text;
+        marquee.setText(text);
     }
 }
 
-void set_speed(int& refreshSpeed, std::vector<std::string> args) {
+void setSpeed(Marquee& marquee, std::vector<std::string> args) {
     if (args.size() != 1)
         std::cout << "Invalid arguments. Usage: set_speed <text>. Use \"help\" for more information\n";
     else
-        refreshSpeed = std::stoi(args[1]);
+        marquee.setSpeed(std::stoi(args[1]));
 }
 
-void command_interface(bool& isMarqueeRunning, std::string& marqueeText, int& refreshSpeed, bool& isProgramRunning) {
-    std::string input = "";
+void displayDefault(Marquee marquee, bool show = true)
+{
+    marquee.printMarquee();
+    if (show)
+        std::cout << "Developer:\n" << "Claro, Stephen Jakobb G.\n\n"; 
+}
 
-    std::cout << "Group Developer:\n" << "Claro, Stephen Jakobb G.\n" << "Omandac, Karl Deejay\n\n"; 
+void commandInterface(bool& isProgramRunning, 
+                       bool& isMarqueeRunning, 
+                       Marquee& marquee
+                    ) 
+{
+    std::string input = "";
     std::cout << "Command>";
 
     std::getline(std::cin, input);
@@ -46,23 +61,28 @@ void command_interface(bool& isMarqueeRunning, std::string& marqueeText, int& re
 
     if (args[0] == "help")
     {
-        view_help();
+        displayDefault(marquee, false);
+        viewHelp();
     }
     else if (args[0] == "start_marquee")
     {
         isMarqueeRunning = true;
+        displayDefault(marquee);
     }        
     else if (args[0] == "stop_marquee")
     {
         isMarqueeRunning = false;
+        displayDefault(marquee);
     }
     else if (args[0] == "set_text")
     {
-        set_text(marqueeText, args);
+        setText(marquee, args);
+        displayDefault(marquee);
     }
     else if (args[0] == "set_speed")
     {
-        set_speed(refreshSpeed, args);
+        setSpeed(marquee, args);
+        displayDefault(marquee);
     }
     else if (args[0] == "exit")
     {
@@ -72,4 +92,5 @@ void command_interface(bool& isMarqueeRunning, std::string& marqueeText, int& re
     {
         std::cout << "Error. Unknown command input.\n";
     }
+    
 }
