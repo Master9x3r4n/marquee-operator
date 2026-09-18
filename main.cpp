@@ -12,7 +12,7 @@
 int main() 
 {
     bool isProgramRunning = true;
-    Marquee marquee = Marquee("STINKY CLAIR!");
+    Marquee marquee = Marquee("CSOPESY");
     
     if (!marquee.initializeFont()) return 1;
 

@@ -1,6 +1,5 @@
 # OS MARQUEE OPERATOR
 - Claro, Stephen Jakobb
-- Omandac, Karl Deejay
 
 This project contains a simple OS Emulator with a display output and command input. The main menu console consists of a scrolling ascii graphic marquee "animation" and Acceot commands to change the behavior of the text marquee. 
 The following are the eligible commands to use:
