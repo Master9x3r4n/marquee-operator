@@ -21,12 +21,14 @@ int main()
     
     isProgramRunning = marquee.initializeFont();
 
-    marquee.printMarquee();
-    std::cout << "Developer:\n" << "Claro, Stephen Jakobb G.\n\n"; 
-    while (isProgramRunning)
-    {
-        commandInterface(isProgramRunning, isMarqueeRunning, marquee);
-    }
+    std::cout << "\033[2J\033[H"; 
+    marquee.scrollMarquee();
 
-    return 0;
+    // std::cout << "Developer:\n" << "Claro, Stephen Jakobb G.\n\n"; 
+    // while (isProgramRunning)
+    // {
+    //     commandInterface(isProgramRunning, isMarqueeRunning, marquee);
+    // }
+
+    // return 0;
 }

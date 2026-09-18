@@ -4,26 +4,32 @@
 #include <string>
 #include <vector>
 #include <array>
+#include <thread>
+#include <chrono>
 constexpr int HEIGHT = 7;
 
 class Marquee
 {
 private:
     std::vector<std::array<std::string, HEIGHT>> marqueeChars;
-    std::vector<std::array<std::string, HEIGHT>> marqueeText;
+    std::array<std::string, HEIGHT> marqueeText;
     std::string inputText;
     int refreshSpeed;
+    bool running;
 
 public:
+    // Constructor
     Marquee(std::string txt = "csopesy", int rspd = 1000)
     {
         inputText = txt;
         refreshSpeed = rspd;
+        running = true;
     }
 
     void setText(std::string txt)
     {
         inputText = txt;
+        generateMarqueeText();
     }
 
     std::string getText()
@@ -36,23 +42,71 @@ public:
         refreshSpeed = spd;
     }
 
-    int getSpeed(int spd)
+    int getSpeed()
     {
         return refreshSpeed;
     }
 
+    bool isRunning()
+    {
+        return running;
+    }
+
+    void setRunning(bool run)
+    {
+        running = run;
+    }
+
     void printMarquee()
     {
-        generateMarqueeText();
         for (int j = 0; j < HEIGHT; j ++)
         {
-            for (size_t k = 0; k < inputText.length(); k ++)
-            {
-                // 32 is starting off set for space char
-                std::cout << marqueeText[k][j]; 
-            }
+            std::cout << marqueeText[j]; 
             std::cout << "\n";
         }
+    }
+
+    // Scroll ASCII art horizontally across `width` columns.
+    void scrollMarquee(
+             int width = 120,
+             int delay_ms = 80)
+    {
+        if (width <= 0) return;
+
+        // Longest line determines scroll distance
+        std::size_t art_width = 0;
+        for (const auto& line : marqueeText)
+            art_width = std::max(art_width, line.size());
+
+        if (art_width == 0) return;
+
+        int pos = width;              // start just off the right edge
+        int pass = 0;
+
+        std::cout << "\x1b[?25l";     // hide cursor
+
+        while (running) {
+            std::cout << "\x1b[H";    // home cursor
+
+            for (const auto& line : marqueeText) {
+                std::string frame(width, ' ');
+                for (std::size_t i = 0; i < line.size(); ++i) {
+                    int x = pos + static_cast<int>(i);
+                    if (x >= 0 && x < width) frame[x] = line[i];
+                }
+                std::cout << frame << "\n";
+            }
+            std::cout << std::flush;
+
+            if (--pos + static_cast<int>(art_width) < 0) {
+                pos = width;
+                ++pass;
+            }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(delay_ms));
+        }
+
+        std::cout << "\x1b[?25h";     // restore cursor
     }
     
     // While I originally made this function by hand with AI assistance, I regenerated the code to accomodate for the fixed widths
@@ -115,20 +169,26 @@ public:
         }
     
         inputFile.close();
+        generateMarqueeText();
         return true;
     }
 
 private:
     void generateMarqueeText() 
     {
-        marqueeText.clear();
-        for (size_t j = 0; j < inputText.length(); j++)
+        int spaceOffset = 32; // 32 is starting off set for space char
+        marqueeText.fill("");
+        for (int k = 0; k < HEIGHT; k ++)
         {
-            // 32 is starting off set for space char
-            int ascii = static_cast<int>(inputText[j]) - 32; 
-            if (ascii < 0 || ascii >= (int)marqueeChars.size()) continue; 
-            marqueeText.push_back(marqueeChars[ascii]);
+            for (size_t j = 0; j < inputText.length(); j++)
+            {
+                //Get current character
+                int ascii = static_cast<int>(inputText[j]) - spaceOffset; 
+                if (ascii < 0 || ascii >= (int)marqueeChars.size()) ascii = 0; 
+
+                marqueeText[k] += marqueeChars[ascii][k];
+            }
         }
     }
-
+    
 };
