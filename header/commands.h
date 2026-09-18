@@ -35,21 +35,37 @@ void setText(Marquee& marquee, std::vector<std::string> args) {
 }
 
 void setSpeed(Marquee& marquee, std::vector<std::string> args) {
-    if (args.size() != 1)
+    if (args.size() != 2)
         std::cout << "Invalid arguments. Usage: set_speed <text>. Use \"help\" for more information\n";
     else
         marquee.setSpeed(std::stoi(args[1]));
+
+    //vibing speed validation input here
+    try {
+        int speed = std::stoi(args[1]);
+        if (speed <= 0)
+            throw std::invalid_argument("speed must be positive");
+        marquee.setSpeed(speed);
+    }
+    catch (const std::exception&) {
+        std::cout << "Invalid speed. Enter a positive whole number of milliseconds.\n";
+    }
+
 }
 
-void displayDefault(Marquee marquee, bool show = true)
+void displayDefault(bool show = true)
 {
-    marquee.printMarquee();
     if (show)
         std::cout << "Developer:\n" << "Claro, Stephen Jakobb G.\n\n"; 
 }
 
+// Moves to the first row under the marquee and erases everything below it.
+void clearCommandArea()
+{
+    std::cout << "\x1b[" << COMMAND_ROW << ";1H\x1b[J" << std::flush;
+}
+
 void commandInterface(bool& isProgramRunning, 
-                       bool& isMarqueeRunning, 
                        Marquee& marquee
                     ) 
 {
@@ -59,30 +75,34 @@ void commandInterface(bool& isProgramRunning,
     std::getline(std::cin, input);
     std::vector<std::string> args = getArgs(input);
 
+    if (args.empty())
+        return;
+
+    clearCommandArea(); 
+
     if (args[0] == "help")
     {
-        displayDefault(marquee, false);
         viewHelp();
     }
     else if (args[0] == "start_marquee")
     {
-        isMarqueeRunning = true;
-        displayDefault(marquee);
+        marquee.setRunning(true);
+        displayDefault();
     }        
     else if (args[0] == "stop_marquee")
     {
-        isMarqueeRunning = false;
-        displayDefault(marquee);
+        marquee.setRunning(false);
+        displayDefault();
     }
     else if (args[0] == "set_text")
     {
         setText(marquee, args);
-        displayDefault(marquee);
+        displayDefault();
     }
     else if (args[0] == "set_speed")
     {
         setSpeed(marquee, args);
-        displayDefault(marquee);
+        displayDefault();
     }
     else if (args[0] == "exit")
     {

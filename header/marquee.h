@@ -1,12 +1,18 @@
-#include <climits>
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
+#include <algorithm>
 #include <array>
-#include <thread>
+#include <atomic>
 #include <chrono>
+#include <climits>
+#include <fstream>
+#include <iostream>
+#include <mutex>
+#include <string>
+#include <thread>
+#include <utility>
+#include <vector>
+
 constexpr int HEIGHT = 7;
+constexpr int COMMAND_ROW = HEIGHT + 2;
 
 class Marquee
 {
@@ -14,32 +20,51 @@ private:
     std::vector<std::array<std::string, HEIGHT>> marqueeChars;
     std::array<std::string, HEIGHT> marqueeText;
     std::string inputText;
-    int refreshSpeed;
-    bool running;
+    
+    // use atomic for thread safe operations
+    std::atomic<int> refreshSpeed;
+    std::atomic<bool> running;
+    std::atomic<bool> quit;
+    
+    std::mutex textMutex; //protect shared data from being accessed by multiple threads at a time, in this case for a text
+    std::thread worker; //thread the marquee belongs to
 
 public:
     // Constructor
-    Marquee(std::string txt = "csopesy", int rspd = 1000)
+    Marquee(std::string txt = "csopesy", int rspd = 80)
+    : inputText(std::move(txt)), refreshSpeed(rspd), running(false), quit(false) {}
+
+    // Make Marquee object a singleton (single instance cannot be copied)
+    Marquee(const Marquee&) = delete;
+    Marquee& operator = (const Marquee&) = delete;
+
+    ~Marquee()
     {
-        inputText = txt;
-        refreshSpeed = rspd;
-        running = true;
+        shutdown();
     }
+
 
     void setText(std::string txt)
     {
+        // locks textMutex from being accessed by multiple threads (like locking a toilet stall, its in use so prevent race condition)
+        std::lock_guard<std::mutex> lock(textMutex);
+
+        // content that only 1 thread accesses at a time
         inputText = txt;
         generateMarqueeText();
+
+        //automatically gets unlocked when lock is out of scope
     }
 
     std::string getText()
     {
+        std::lock_guard<std::mutex> lock(textMutex);
         return inputText;
     }
 
     void setSpeed(int spd)
     {
-        refreshSpeed = spd;
+        refreshSpeed = std::max(1, spd);
     }
 
     int getSpeed()
@@ -57,56 +82,29 @@ public:
         running = run;
     }
 
-    void printMarquee()
+    // void printMarquee()
+    // {
+    //     for (int j = 0; j < HEIGHT; j ++)
+    //         std::cout << marqueeText[j] << "\n"; 
+
+    // }
+
+    void startAnimation(int screenW = 120)
     {
-        for (int j = 0; j < HEIGHT; j ++)
-        {
-            std::cout << marqueeText[j]; 
-            std::cout << "\n";
-        }
+        if (worker.joinable()) // if active thread, then no anim
+            return;
+
+        // init for worker, make it an active thread for the animation loop
+        quit = false;
+        worker = std::thread(&Marquee::animationLoop, this, screenW);
+        
     }
 
-    // Scroll ASCII art horizontally across `width` columns.
-    void scrollMarquee(
-             int width = 120,
-             int delay_ms = 80)
+    void shutdown()
     {
-        if (width <= 0) return;
-
-        // Longest line determines scroll distance
-        std::size_t art_width = 0;
-        for (const auto& line : marqueeText)
-            art_width = std::max(art_width, line.size());
-
-        if (art_width == 0) return;
-
-        int pos = width;              // start just off the right edge
-        int pass = 0;
-
-        std::cout << "\x1b[?25l";     // hide cursor
-
-        while (running) {
-            std::cout << "\x1b[H";    // home cursor
-
-            for (const auto& line : marqueeText) {
-                std::string frame(width, ' ');
-                for (std::size_t i = 0; i < line.size(); ++i) {
-                    int x = pos + static_cast<int>(i);
-                    if (x >= 0 && x < width) frame[x] = line[i];
-                }
-                std::cout << frame << "\n";
-            }
-            std::cout << std::flush;
-
-            if (--pos + static_cast<int>(art_width) < 0) {
-                pos = width;
-                ++pass;
-            }
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(delay_ms));
-        }
-
-        std::cout << "\x1b[?25h";     // restore cursor
+        quit = true;
+        if (worker.joinable()) // block thread
+            worker.join();
     }
     
     // While I originally made this function by hand with AI assistance, I regenerated the code to accomodate for the fixed widths
@@ -169,11 +167,73 @@ public:
         }
     
         inputFile.close();
-        generateMarqueeText();
+        {
+            std::lock_guard<std::mutex> lock(textMutex);
+            generateMarqueeText();
+        }
         return true;
     }
 
 private:
+    // Runs on the worker thread until shutdown().
+    void animationLoop(int screenW)
+    {
+        int pos = 0;
+        while (!quit)
+        {
+            // frame builds the output string
+            std::string frame = "\x1b" "7"; // save cursor position
+
+            {
+                // lock this thread from being used
+                std::lock_guard<std::mutex> lock(textMutex);
+
+                // Get overall max width of full text ascii art
+                std::size_t artWidth = 0;
+                for (const auto& line : marqueeText)
+                    artWidth = std::max(artWidth, line.size());
+
+                for (int j = 0; j < HEIGHT; ++j)
+                {
+                    std::string row(screenW, ' ');
+                    const std::string& line = marqueeText[j]; // get curr line/row
+
+                    // Go through each col and determine loopy overflow + width math
+                    for (std::size_t i = 0; i < line.size(); ++i)
+                    {
+                        int x = pos + static_cast<int>(i);
+                        if (x >= 0 && x < screenW) row[x] = line[i];
+                    }
+
+                    // build: Absolute move to (row+1, col 1), then the row contents
+                    frame += "\x1b[" + std::to_string(j + 1) + ";1H" + row;
+                }
+
+                if (running)
+                {
+                    // re-enter to right loopy
+                    if (--pos + static_cast<int>(artWidth) < 0)
+                        pos = screenW;
+                } 
+                else 
+                {
+                    pos = 0; //back to start
+                }
+            }
+
+            // build: restore cursor pos
+            frame += "\x1b" "8";
+
+            // build output string: save cursor pos -> move to next row -> loop
+            std::cout << frame << std::flush;
+
+            // simulate refresh speed by sleeping the thread
+            int delay = running ? refreshSpeed.load() : 50;   // static text still refreshes on set_text
+            std::this_thread::sleep_for(std::chrono::milliseconds(delay)); // delay
+
+        }
+    }
+
     void generateMarqueeText() 
     {
         int spaceOffset = 32; // 32 is starting off set for space char

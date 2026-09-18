@@ -9,26 +9,24 @@
 #include "header/text.h"
 #include "header/commands.h"
 
-#define HEIGHT 7
-
 int main() 
 {
     bool isProgramRunning = true;
-    bool isMarqueeRunning = false;
-    std::string marqueeInput = "HELLO WORLD!";
-    std::vector<std::array<std::string, HEIGHT>> marqueeContainer;
-    Marquee marquee = Marquee(marqueeInput);
+    Marquee marquee = Marquee("STINKY CLAIR!");
     
-    isProgramRunning = marquee.initializeFont();
+    if (!marquee.initializeFont()) return 1;
 
-    std::cout << "\033[2J\033[H"; 
-    marquee.scrollMarquee();
+    // clear screen and allocate console area for marquee and console
+    std::cout << "\x1b[2J\x1b[H"
+          << "\x1b[" << COMMAND_ROW << "r"
+          << "\x1b[" << COMMAND_ROW << ";1H";
+            
+    // TODO: run marquee animation
+    marquee.startAnimation();
+    while (isProgramRunning) commandInterface(isProgramRunning, marquee);
 
-    // std::cout << "Developer:\n" << "Claro, Stephen Jakobb G.\n\n"; 
-    // while (isProgramRunning)
-    // {
-    //     commandInterface(isProgramRunning, isMarqueeRunning, marquee);
-    // }
+    // release allocated area then clear screen
+    std::cout << "\x1b[r\x1b[2J\x1b[H";
 
-    // return 0;
+    return 0;
 }
