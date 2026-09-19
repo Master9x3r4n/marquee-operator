@@ -1,5 +1,5 @@
-#include "commands.h"
-#include "text.h"
+#include "headers/commands.h"
+#include "headers/text.h"
 
 #include <iomanip>
 #include <iostream>
@@ -104,6 +104,6 @@ void commandInterface(bool& isProgramRunning, Marquee& marquee)
     }
     else
     {
-        std::cout << "Error. Unknown command input.\n";
+        std::cout << "Error. Unknown command input. Type 'help' for a list of commands.\n";
     }
 }

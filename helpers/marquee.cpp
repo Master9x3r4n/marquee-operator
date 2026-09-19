@@ -1,4 +1,4 @@
-#include "marquee.h"
+#include "headers/marquee.h"
 
 #include <algorithm>
 #include <chrono>
@@ -66,7 +66,7 @@ void Marquee::shutdown()
 
 bool Marquee::initializeFont()
 {
-    std::ifstream inputFile("text/ascii_font.txt");
+    std::ifstream inputFile("helpers/text/ascii_font.txt");
     marqueeChars.clear();
 
     if (!inputFile.is_open()) {

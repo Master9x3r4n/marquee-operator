@@ -5,9 +5,9 @@
 #include <array>
 #include <thread>
 
-#include "header/marquee.h"
-#include "header/text.h"
-#include "header/commands.h"
+#include "helpers/headers/marquee.h"
+#include "helpers/headers/text.h"
+#include "helpers/headers/commands.h"
 
 int main() 
 {
@@ -29,6 +29,7 @@ int main()
 
     // release allocated area then clear screen
     std::cout << "\x1b[r\x1b[2J\x1b[H";
+    std::cout << "Terminating...\n";
 
     return 0;
 }

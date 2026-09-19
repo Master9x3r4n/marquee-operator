@@ -15,8 +15,8 @@ This project was developed using **C++** and implements threading for the rotati
 ## Usage
 Compile and run the program using 
 ```
-g++ -Wall -static -o main.exe main.cpp
-main
+g++ -Wall -static -std=c++17 -o main.exe main.cpp helpers/marquee.cpp helpers/text.cpp helpers/commands.cpp
+main.exe
 ```
 Or run using batch file
 ```
