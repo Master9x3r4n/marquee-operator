@@ -21,9 +21,11 @@ int main()
           << "\x1b[" << COMMAND_ROW << "r"
           << "\x1b[" << COMMAND_ROW << ";1H";
             
-    // TODO: run marquee animation
+    // main marquee + thing
     marquee.startAnimation();
-    while (isProgramRunning) commandInterface(isProgramRunning, marquee);
+    displayDefault();
+    while (isProgramRunning) 
+        commandInterface(isProgramRunning, marquee);
 
     // release allocated area then clear screen
     std::cout << "\x1b[r\x1b[2J\x1b[H";
