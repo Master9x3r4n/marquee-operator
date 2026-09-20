@@ -13,15 +13,25 @@ The following are the eligible commands to use:
 This project was developed using **C++** and implements threading for the rotating marquee functionality.
 
 ## Usage
-Compile and run the program using 
+Requires CMake 3.16+ and a C++17 compiler (g++, clang, or MSVC).
+
+Configure and build
 ```
-g++ -Wall -static -std=c++17 -o main.exe main.cpp helpers/marquee.cpp helpers/text.cpp helpers/commands.cpp
-main.exe
+cmake -S . -B build
+cmake --build build
 ```
-Or run using batch file
+If you are using MinGW on Windows, add `-G "MinGW Makefiles"` to the first command.
+
+Then build and run in one step using
 ```
-run
+cmake --build build --target run
 ```
+Or run the executable manually from inside the build folder
+```
+cd build
+os_marquee        # ./os_marquee on Linux/macOS
+```
+The program loads `helpers/text/ascii_font.txt` relative to the working directory, and the build copies it next to the executable, so run it from the folder containing the executable (with Visual Studio's generator this is `build\Debug`).
 
 ## Credits
 Fonts obtained from https://patorjk.com/software/taag/
