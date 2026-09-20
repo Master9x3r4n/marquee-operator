@@ -52,6 +52,7 @@ helpers/
   marquee.cpp
   text.cpp
 .gitignore
+Cmakelists.txt
 main.cpp
 README.md
 run.bat
@@ -59,6 +60,51 @@ run.bat
 
 <files>
 This section contains the contents of the repository's files.
+
+<file path="Cmakelists.txt">
+cmake_minimum_required(VERSION 3.16)
+project(OSEmulator VERSION 1.0 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+add_executable(os_emulator
+    main.cpp
+)
+
+# Lets any file write #include "utils/Display.hpp" regardless of its own folder.
+target_include_directories(os_emulator PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+# Your old -Wall, made compiler-aware.
+if(MSVC)
+    target_compile_options(os_emulator PRIVATE /W4)
+else()
+    target_compile_options(os_emulator PRIVATE -Wall)
+endif()
+
+# Your old -static (only needed for MinGW so the .exe doesn't depend on MinGW DLLs).
+if(MINGW)
+    target_link_options(os_emulator PRIVATE -static)
+endif()
+
+# The program opens "config/config.txt" relative to the working directory,
+# so copy it next to the executable after every build.
+add_custom_command(TARGET os_emulator POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:os_emulator>/config
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${CMAKE_CURRENT_SOURCE_DIR}/config/config.txt
+            $<TARGET_FILE_DIR:os_emulator>/config/config.txt
+)
+
+# Replacement for run.bat:  cmake --build build --target run
+add_custom_target(run
+    COMMAND os_emulator
+    WORKING_DIRECTORY $<TARGET_FILE_DIR:os_emulator>
+    DEPENDS os_emulator
+    USES_TERMINAL
+)
+</file>
 
 <file path="helpers/headers/commands.h">
 #ifndef COMMANDS_H
@@ -1002,7 +1048,7 @@ void commandInterface(bool& isProgramRunning, Marquee& marquee)
     }
     else
     {
-        std::cout << "Error. Unknown command input.\n";
+        std::cout << "Error. Unknown command input. Type 'help' for a list of commands.\n";
     }
 }
 </file>
@@ -1226,7 +1272,10 @@ build/*
 </file>
 
 <file path="run.bat">
-
+@echo off
+g++ -Wall -static -std=c++17 -o main.exe main.cpp helpers/marquee.cpp helpers/text.cpp helpers/commands.cpp
+if errorlevel 1 exit /b %errorlevel%
+main.exe
 </file>
 
 <file path="README.md">
@@ -1291,6 +1340,7 @@ int main()
 
     // release allocated area then clear screen
     std::cout << "\x1b[r\x1b[2J\x1b[H";
+    std::cout << "Terminating...\n";
 
     return 0;
 }
