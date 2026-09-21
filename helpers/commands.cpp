@@ -56,7 +56,7 @@ void displayDefault(bool show)
         std::cout << "Developer:\n" 
                 << "   Claro, Stephen Jakobb G.\n\n"
                 << "   Infante, Gabriel\n"
-                << "   Amogus, Sussus\n"
+                << "   Omandac, Karl Deejay\n"
                 << "   Placer, Paul John\n\n";
 }
 
