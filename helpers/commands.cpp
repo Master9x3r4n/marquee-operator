@@ -53,7 +53,11 @@ void setSpeed(Marquee& marquee, std::vector<std::string> args) {
 void displayDefault(bool show)
 {
     if (show)
-        std::cout << "Developer:\n" << "Claro, Stephen Jakobb G.\n\n";
+        std::cout << "Developer:\n" 
+                << "   Claro, Stephen Jakobb G.\n\n"
+                << "   Infante, Gabriel\n"
+                << "   Amogus, Sussus\n"
+                << "   Placer, Paul John\n\n";
 }
 
 void clearCommandArea()
