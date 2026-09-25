@@ -23,6 +23,7 @@ void setText(Marquee& marquee, std::vector<std::string> args) {
     if (args.size() < 2) {
         std::cout << "Invalid arguments. Usage: set_text <text>. Use \"help\" for more information\n";
     } else {
+        // for each word, append a space between them
         std::string text = "";
         for (unsigned int i = 1; i < args.size(); i++) {
             text = text + args[i];
@@ -40,6 +41,7 @@ void setSpeed(Marquee& marquee, std::vector<std::string> args) {
     }
 
     try {
+        // convert given speed from string to int
         int speed = std::stoi(args[1]);
         if (speed <= 0)
             throw std::invalid_argument("speed must be positive");
@@ -54,7 +56,7 @@ void displayDefault(bool show)
 {
     if (show)
         std::cout << "Developer:\n" 
-                << "   Claro, Stephen Jakobb G.\n\n"
+                << "   Claro, Stephen Jakobb G.\n"
                 << "   Infante, Gabriel\n"
                 << "   Omandac, Karl Deejay\n"
                 << "   Placer, Paul John\n\n";
@@ -70,12 +72,15 @@ void commandInterface(bool& isProgramRunning, Marquee& marquee)
     std::string input = "";
     std::cout << "Command>";
 
+    // get input and tokenize
     std::getline(std::cin, input);
     std::vector<std::string> args = getArgs(input);
 
+    // if nothing was typed, do nothing
     if (args.empty())
         return;
 
+    // clear anything in the command row
     clearCommandArea();
 
     if (args[0] == "help")
