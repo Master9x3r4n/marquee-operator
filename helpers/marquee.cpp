@@ -17,6 +17,7 @@ Marquee::~Marquee()
 
 void Marquee::setText(std::string txt)
 {
+    // only unlock inputText when `set_text` command is recognized
     std::lock_guard<std::mutex> lock(textMutex);
     inputText = txt;
     generateMarqueeText();
@@ -131,15 +132,19 @@ void Marquee::animationLoop(int screenW)
     int pos = 0;
     while (!quit)
     {
+        // save cursor position
         std::string frame = "\x1b" "7";
 
         {
+            // locks marqueeText first from other threads other than this
             std::lock_guard<std::mutex> lock(textMutex);
 
+            // find the max width of the ascii art for the marquee text
             std::size_t artWidth = 0;
             for (const auto& line : marqueeText)
                 artWidth = std::max(artWidth, line.size());
 
+            // for each row of the ascii art, print the necessary chars such that it aligns with the column pos
             for (int j = 0; j < HEIGHT; ++j)
             {
                 std::string row(screenW, ' ');
@@ -151,20 +156,24 @@ void Marquee::animationLoop(int screenW)
                     if (x >= 0 && x < screenW) row[x] = line[i];
                 }
 
+                // move to next row
                 frame += "\x1b[" + std::to_string(j + 1) + ";1H" + row;
             }
 
             if (running)
             {
+                // move the column pos back to the very right
                 if (--pos + static_cast<int>(artWidth) < 0)
                     pos = screenW;
             }
             else
             {
+                // stay in left if the animation is not running
                 pos = 0;
             }
         }
 
+        // restore cursor position
         frame += "\x1b" "8";
 
         std::cout << frame << std::flush;
