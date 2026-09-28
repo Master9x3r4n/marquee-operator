@@ -25,9 +25,10 @@ cmake --build build
 ```
 If you are using MinGW on Windows, add `-G "MinGW Makefiles"` to the first command.
 
-Then build and run in one step using
+Then build and run in using
 ```
-cmake --build build --target run
+cd build\Debug      (or just `cd build` with MinGW/Ninja)
+os_marquee.exe
 ```
 Or run the executable manually from inside the build folder
 ```
